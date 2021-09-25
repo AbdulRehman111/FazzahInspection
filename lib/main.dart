@@ -1,4 +1,6 @@
 // main.dart
+// ignore: import_of_legacy_library_into_null_safe
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:get/get.dart';
@@ -7,7 +9,13 @@ import 'pages/inidentdetails.dart';
 import 'pages/takeaction.dart';
 import 'pages/login.dart';
 void main() {
-  runApp(MyApp());
+  runApp(EasyLocalization(child: MyApp(),
+  path: "resources/langs",
+  saveLocale: true,
+  supportedLocales: [
+    Locale('en','US'),
+    Locale('ar','AR')
+  ],));
 }
 
 class MyApp extends StatelessWidget {
@@ -18,6 +26,9 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'FazzahInspection',
       theme: ThemeData(primarySwatch: Colors.deepOrange),
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       home: HomePage(),
       getPages: [
         GetPage(name: '/page-three', page: () => TakeAction()),
@@ -34,14 +45,15 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Fazzah Inspector'),
+        title: Text('title').tr(),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Navigate ising screen classes'),
+          children:<Widget> [
+            Text('hello').tr(),
+           
             ElevatedButton(
                 onPressed: () => Get.to(Inbox(), arguments: {
                       'id': '657657657575765'
@@ -61,6 +73,7 @@ class HomePage extends StatelessWidget {
                       '/page-four/${Random().nextInt(10000)}',
                     ),
                 child: Text('Go to page Four'))
+          ,
           ],
         ),
       ),
