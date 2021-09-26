@@ -8,7 +8,11 @@ import 'pages/inbox.dart';
 import 'pages/inidentdetails.dart';
 import 'pages/takeaction.dart';
 import 'pages/login.dart';
-void main() {
+import 'pages/theme_service.dart';
+import 'pages/themes.dart';
+import "package:get_storage/get_storage.dart";
+void main() async {
+ await GetStorage.init();
   runApp(EasyLocalization(child: MyApp(),
   path: "resources/langs",
   saveLocale: true,
@@ -21,14 +25,22 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+
+
+
+    
     return GetMaterialApp(
       // Remove the debug banner
       debugShowCheckedModeBanner: false,
       title: 'FazzahInspection',
-      theme: ThemeData(primarySwatch: Colors.deepOrange),
+      //theme: ThemeData(primarySwatch: Colors.deepOrange),
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
+      theme:Themes.light,
+      darkTheme: Themes.dark,
+      themeMode: ThemeService().theme,
+
       home: HomePage(),
       getPages: [
         GetPage(name: '/page-three', page: () => TakeAction()),
@@ -44,6 +56,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: context.theme.backgroundColor,
       appBar: AppBar(
         title: Text('title').tr(),
       ),
@@ -74,6 +87,14 @@ class HomePage extends StatelessWidget {
                     ),
                 child: Text('Go to page Four'))
           ,
+          RaisedButton(
+          color: context.theme.buttonColor,
+          child: Text(
+            'Change Theme',
+            style: TextStyle(color: Colors.white),
+          ),
+          onPressed: ThemeService().switchTheme,
+        ),
           ],
         ),
       ),
