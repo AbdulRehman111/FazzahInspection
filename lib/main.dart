@@ -1,106 +1,210 @@
-// main.dart
-// ignore: import_of_legacy_library_into_null_safe
-import 'package:easy_localization/easy_localization.dart';
+// // // main.dart
+// // ignore: import_of_legacy_library_into_null_safe
+// //import 'package:easy_localization/easy_localization.dart';
+// ignore_for_file: import_of_legacy_library_into_null_safe
+
 import 'package:flutter/material.dart';
-import 'dart:math';
+// import 'dart:math';
 import 'package:get/get.dart';
 import 'pages/inbox.dart';
-import 'pages/inidentdetails.dart';
-import 'pages/takeaction.dart';
+import 'pages/archive.dart';
+import 'pages/resources/theme_service.dart';
+import 'pages/resources/themes.dart';
+import 'theme/storage.dart';
 import 'pages/login.dart';
-import 'pages/theme_service.dart';
-import 'pages/themes.dart';
+import 'pages/resources/app_translation.dart';
 import "package:get_storage/get_storage.dart";
+import './pages/home.dart';
+
 void main() async {
- await GetStorage.init();
-  runApp(EasyLocalization(child: MyApp(),
-  path: "resources/langs",
-  saveLocale: true,
-  supportedLocales: [
-    Locale('en','US'),
-    Locale('ar','AR')
-  ],));
+  await GetStorage.init();
+
+  var landingPage = '';
+  var isLogin = box.read('isLogin').toString();
+
+  if (isLogin == true || isLogin == 'true') {
+    landingPage = '/home';
+  } else {
+    landingPage = '/login';
+  }
+  print(isLogin);
+  print(landingPage);
+  runApp(GetMaterialApp(
+    navigatorKey: Get.key,
+    debugShowCheckedModeBanner: false,
+    translations: AppTranslation(),
+    locale: Locale('en', 'US'),
+    fallbackLocale: Locale('en', 'US'),
+    theme: Themes.light,
+    darkTheme: Themes.dark,
+    themeMode: ThemeService().theme,
+
+    initialRoute: landingPage,
+    // initialRoute: '/home',
+    getPages: [
+      GetPage(
+        name: '/home',
+        page: () => Home(),
+        binding: HomeBinding(),
+      ),
+      GetPage(
+        name: '/inbox',
+        page: () => InboxPage(),
+        binding: InboxBinding(),
+      ),
+      GetPage(
+        name: '/login',
+        page: () => Login(),
+        binding: LoginBinding(),
+      ),
+      GetPage(
+        name: '/archive',
+        page: () => Archive(),
+        binding: ArchiveBinding(),
+      ),
+    ],
+  ));
 }
 
-class MyApp extends StatelessWidget {
+class InboxBinding extends Bindings {
   @override
-  Widget build(BuildContext context) {
-
-
-
-    
-    return GetMaterialApp(
-      // Remove the debug banner
-      debugShowCheckedModeBanner: false,
-      title: 'FazzahInspection',
-      //theme: ThemeData(primarySwatch: Colors.deepOrange),
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      locale: context.locale,
-      theme:Themes.light,
-      darkTheme: Themes.dark,
-      themeMode: ThemeService().theme,
-
-      home: HomePage(),
-      getPages: [
-        GetPage(name: '/page-three', page: () => TakeAction()),
-        GetPage(
-            name: '/page-four/:data', page: () => Login()) // Dynamic route
-      ],
-    );
+  void dependencies() {
+    Get.lazyPut(() => InboxController());
   }
 }
 
-// Home Screen
-class HomePage extends StatelessWidget {
+// // class Inbox extends GetView<InboxController> {
+// //   @override
+// //   Widget build(BuildContext context) {
+// //     return Scaffold(
+// //       appBar: AppBar(title: Text('Inbox')),
+// //       drawer: MainDrawer(),
+// //
+// //       body: Center(
+// //         child: Text(controller.title),
+// //       ),
+// //     );
+// //   }
+// // }
+// //
+class InboxController extends GetxController {
+  final title = 'Inbox';
+
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.theme.backgroundColor,
-      appBar: AppBar(
-        title: Text('title').tr(),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children:<Widget> [
-            Text('hello').tr(),
-           
-            ElevatedButton(
-                onPressed: () => Get.to(Inbox(), arguments: {
-                      'id': '657657657575765'
-                    }), // Passing data by using "arguments"
-                child: Text('Go to page One')),
-            ElevatedButton(
-                onPressed: () => Get.off(IncidentDetails()),
-                child: Text('Go to page Two (Can not go back)')),
-            Divider(),
-            Text('Navigate Using named routes'),
-            OutlinedButton(
-                onPressed: () => Get.toNamed('/page-three',
-                    arguments: {'id': Random().nextInt(10000).toString()}),
-                child: Text('Go to page Three')),
-            OutlinedButton(
-                onPressed: () => Get.toNamed(
-                      '/page-four/${Random().nextInt(10000)}',
-                    ),
-                child: Text('Go to page Four'))
-          ,
-          RaisedButton(
-          color: context.theme.buttonColor,
-          child: Text(
-            'Change Theme',
-            style: TextStyle(color: Colors.white),
-          ),
-          onPressed: ThemeService().switchTheme,
-        ),
-          ],
-        ),
-      ),
-    );
+  void onInit() {
+    print('>>> InboxController init');
+    super.onInit();
+  }
+
+  @override
+  void onReady() {
+    print('>>> InboxController ready');
+    super.onReady();
+  }
+
+  @override
+  void onClose() {
+    print('>>> Page1Controller close');
+    super.onClose();
   }
 }
 
+class LoginBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut(() => LoginController());
+  }
+}
 
+class LoginController extends GetxController {
+  final title = 'Page 2';
 
+  @override
+  void onInit() {
+    print('>>> Page2Controller init');
+    super.onInit();
+  }
+
+  @override
+  void onReady() {
+    print('>>> Page2Controller ready');
+    super.onReady();
+  }
+
+  @override
+  void onClose() {
+    print('>>> Page2Controller close');
+    super.onClose();
+  }
+}
+
+class ArchiveBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut(() => LoginController());
+  }
+}
+
+class HomeBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut(() => HomeController());
+  }
+}
+
+class ArchiveController extends GetxController {
+  final title = 'Page 2';
+
+  @override
+  void onInit() {
+    print('>>> Page2Controller init');
+    super.onInit();
+  }
+
+  @override
+  void onReady() {
+    print('>>> Page2Controller ready');
+    super.onReady();
+  }
+
+  @override
+  void onClose() {
+    print('>>> Page2Controller close');
+    super.onClose();
+  }
+}
+
+class HomeController extends GetxController {
+  final title = 'Home';
+
+  @override
+  void onInit() {
+    print('>>> Page2Controller init');
+    super.onInit();
+  }
+
+  @override
+  void onReady() {
+    print('>>> Page2Controller ready');
+    super.onReady();
+  }
+
+  @override
+  void onClose() {
+    print('>>> Page2Controller close');
+    super.onClose();
+  }
+}
+// import 'package:flutter/material.dart';
+// import 'pages/inbox.dart';
+// import 'theme/colors.dart';
+//
+// void main() => runApp(
+//     MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       theme: ThemeData(
+//           primaryColor: primary
+//       ),
+//       home: IndexPage(),
+//     )
+// );
