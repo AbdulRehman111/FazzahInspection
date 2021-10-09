@@ -24,6 +24,7 @@ class AppTranslation extends Translations {
           'wrongUsernameOrPass': 'Wrong username or password!',
           'requiredUsername': 'Username is required!',
           'requiredPass': 'Password is required!',
+          'incidentDetails':'Incident Details',
         },
         'ar_ae': {
           'FazzahInspection': "تفتيش فزة",
@@ -42,6 +43,7 @@ class AppTranslation extends Translations {
           'wrongUsernameOrPass': 'اسم المستخدم أو كلمة المرور خاطئة!',
           'requiredUsername': 'اسم المستخدم مطلوب!',
           'requiredPass': 'كلمة المرور مطلوبة!',
+          'incidentDetails':'Incident Details',
         }
       };
 }

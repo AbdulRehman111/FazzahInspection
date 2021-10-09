@@ -96,8 +96,8 @@ class _HomeState extends State<Home> {
                         ),
                         child: Text('FazzahInspection'.tr,
                           style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18
+                            color: Colors.orange.shade700,
+                            fontSize: 20
                           ),
                         ),
                       ),

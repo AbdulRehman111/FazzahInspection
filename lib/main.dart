@@ -12,6 +12,7 @@ import 'pages/resources/theme_service.dart';
 import 'pages/resources/themes.dart';
 import 'theme/storage.dart';
 import 'pages/login.dart';
+import 'pages/login1.dart';
 import 'pages/resources/app_translation.dart';
 import "package:get_storage/get_storage.dart";
 import './pages/home.dart';
@@ -25,7 +26,7 @@ void main() async {
   if (isLogin == true || isLogin == 'true') {
     landingPage = '/home';
   } else {
-    landingPage = '/login';
+    landingPage = '/login1';
   }
   print(isLogin);
   print(landingPage);
@@ -53,8 +54,8 @@ void main() async {
         binding: InboxBinding(),
       ),
       GetPage(
-        name: '/login',
-        page: () => Login(),
+        name: '/login1',
+        page: () => LoginPage(),
         binding: LoginBinding(),
       ),
       GetPage(

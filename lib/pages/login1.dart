@@ -1,5 +1,16 @@
+import 'dart:async';
+import 'dart:io';
+import '../pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:rounded_loading_button/rounded_loading_button.dart';
+import 'dart:convert' as convert;
+import '../theme/storage.dart';
+import 'package:http/http.dart' as http;
+
+TextEditingController nameController = TextEditingController();
+TextEditingController passwordController = TextEditingController();
 
 class LoginPage extends StatefulWidget {
   @override
@@ -14,6 +25,113 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     SystemChrome.setEnabledSystemUIOverlays([]);
     super.initState();
+  }
+  final RoundedLoadingButtonController _btnController =
+      RoundedLoadingButtonController();
+  void userAuthSubmit() async {
+    print(nameController.text);
+    print(_btnController);
+    print(passwordController.text);
+    if (nameController.text == '') {
+      alert('Alert'.tr, 'requiredUsername'.tr, 'Close'.tr);
+      _btnController.error();
+    }
+    if (passwordController.text == '') {
+      alert('Alert'.tr, 'requiredPass'.tr, 'Close'.tr);
+      _btnController.error();
+    }
+
+    final queryParameters = {
+      'userName': nameController.text,
+      'password': passwordController.text,
+    };
+    // var response1 = await http.get(Uri.https('portal.fujmun.gov.ae', 'fazzahAPI/api/Inspector/authenticateUser', queryParameters));
+
+    final uri = Uri.https(
+        mainURL, 'fazzahAPI/api/Inspector/authenticateUser', queryParameters);
+    final response = await http.get(uri, headers: {
+      HttpHeaders.contentTypeHeader: 'application/json',
+    });
+
+    if (response.statusCode == 200) {
+      //  print(response.body);
+      var jsonData = convert.jsonDecode(response.body);
+
+      // print(jsonData);
+
+      Map<String, dynamic> userProfile = convert.jsonDecode(response.body);
+      print(userProfile);
+
+      Map<String, dynamic> userDetails = userProfile['userProfile'];
+
+      if (userDetails == null || userDetails == 'null') {
+        alert('Alert'.tr, 'wrongUsernameOrPass'.tr, 'Close'.tr);
+        _btnController.error();
+      } else {
+        //   box.write('nameEn', user['nameEn']);
+        //   print('Howdy, ${user1['userId']}');
+        // print('Howdy, ${userDetails['userId']}');
+        box.write('userId', userDetails['userId']);
+        box.write('firstName', userDetails['firstName']);
+        box.write('lastName', userDetails['lastName']);
+        box.write('email', userDetails['email']);
+        box.write('phoneNumber', userDetails['phoneNumber']);
+        box.write('passportNumber', userDetails['passportNumber']);
+        box.write('passportExpiryDate', userDetails['passportExpiryDate']);
+        box.write('profileURL', userDetails['profileURL']);
+        box.write('workingHourFrom', userDetails['workingHourFrom']);
+        box.write('WorkingHourTo', userDetails['WorkingHourTo']);
+        box.write('submissionDate', userDetails['submissionDate']);
+
+        box.write('isLogin', true);
+
+        print(userDetails['department']);
+        //get user department
+        Map<String, dynamic> userDepartment = userDetails['department'];
+        box.write('departmentNameEn', userDepartment['nameEn']);
+        box.write('departmentNameAr', userDepartment['nameAr']);
+        //get user branch
+        Map<String, dynamic> branch = userDepartment['branch'];
+        box.write('branchNameEn', branch['nameEn']);
+        box.write('branchNameAr', branch['nameAr']);
+
+        print(userDepartment['nameEn']);
+        print('Howdy, ${userDetails['department']}');
+
+        print('Login');
+        _btnController.success();
+        Timer(const Duration(microseconds: 30), () {
+          Get.to(Home(), arguments: {
+            // Get.to(UserProfilePage(), arguments: {
+            'userData': convert.jsonDecode(response.body)
+          });
+        });
+      }
+    } else {
+      print('Request failed with status: ${response.statusCode}.');
+    }
+  }
+
+  void alert(title, content, actionText) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text(title),
+          content: new Text(content),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text(actionText),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -44,10 +162,10 @@ class _LoginPageState extends State<LoginPage> {
                   Spacer(),
                   Align(
                     alignment: Alignment.center,
-                    child: Icon(Icons.person,
-                      size: 90,
-                      color: Colors.white,
-                    ),
+                    child: Image.asset(
+                  'assets/logo.png',
+                  fit: BoxFit.cover,
+                )
                   ),
                   Spacer(),
 
@@ -60,8 +178,8 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         child: Text('Login',
                           style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18
+                            color: Colors.orange.shade700,
+                            fontSize: 20
                           ),
                         ),
                       ),
@@ -95,6 +213,7 @@ class _LoginPageState extends State<LoginPage> {
                       ]
                     ),
                     child: TextField(
+                       controller: nameController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         icon: Icon(Icons.person,
@@ -125,6 +244,7 @@ class _LoginPageState extends State<LoginPage> {
                         ]
                     ),
                     child: TextField(
+                      controller: passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
                         border: InputBorder.none,
@@ -157,24 +277,27 @@ class _LoginPageState extends State<LoginPage> {
                       },
                       child: Container(
                       height: 45,
-                      width: MediaQuery.of(context).size.width/1.2,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Color(0xff6bceff),
-                            Color(0xFF00abff),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(50)
-                        )
-                      ),
+                 
+                      // decoration: BoxDecoration(
+                      //   gradient: LinearGradient(
+                      //     colors: [
+                      //       Color(0xff6bceff),
+                      //       Color(0xFF00abff),
+                      //     ],
+                      //   ),
+                        
+                      // ),
                       child: Center(
-                        child: Text('Login'.toUpperCase(),
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold
-                          ),
+                        child: RoundedLoadingButton(
+                          
+                               width: MediaQuery.of(context).size.width/1.2,
+                               color:Color(0xFF00abff),
+                  child:
+                        Text('Login'.tr, style: TextStyle(color: Colors.white)),
+                  resetAfterDuration: true,
+                  controller: _btnController,
+                  onPressed: userAuthSubmit,
+                
                         ),
                       ),
                     ),
@@ -189,13 +312,13 @@ class _LoginPageState extends State<LoginPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Text("Dnon't have an account ?"),
-                  Text("Sign Up",style: TextStyle(color: Color(0xff6bceff)),),
+                  Text("Fujairah Municipality"),
+                  Text(" ©2021",style: TextStyle(color: Color(0xff6bceff)),),
                 ], 
               ),
-              onTap: (){
-                Navigator.pushNamed(context, '/signup');
-              },
+              // onTap: (){
+              //   Navigator.pushNamed(context, '/signup');
+              // },
             ),           
           ],
           
